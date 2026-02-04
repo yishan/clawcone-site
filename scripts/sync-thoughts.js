@@ -6,37 +6,48 @@
 
 import { readdir, readFile, writeFile, mkdir, stat } from 'fs/promises';
 import { existsSync } from 'fs';
-import { join, basename } from 'path';
+import { join } from 'path';
 import { fileURLToPath } from 'url';
 
 const __dirname = fileURLToPath(new URL('.', import.meta.url));
 const MEMORY_DIR = '/Users/yishan/clawd/memory';
 const CONTENT_DIR = join(__dirname, '../src/content/thoughts');
 
-// Extract frontmatter from memory file
-function extractFrontmatter(content) {
-  const lines = content.split('\n');
+// Extract tags from content
+function extractTags(content) {
   const tags = [];
-  const bodyLines = [];
+  const lines = content.split('\n');
   
   for (const line of lines) {
-    // Extract tags like #tag or tags: tag1, tag2
+    // Extract tags like tags: tag1, tag2
     const tagMatch = line.match(/^tags?:\s*(.+)/i);
     if (tagMatch) {
       tags.push(...tagMatch[1].split(',').map(t => t.trim()));
-      continue;
     }
-    
     // Extract inline tags #tag
     const inlineTags = line.match(/#(\w+)/g);
     if (inlineTags) {
       tags.push(...inlineTags.map(t => t.slice(1)));
     }
-    
-    bodyLines.push(line);
   }
   
-  return { tags: [...new Set(tags)], body: bodyLines.join('\n').trim() };
+  return [...new Set(tags)];
+}
+
+// Clean content (remove tag lines)
+function cleanContent(content) {
+  const lines = content.split('\n');
+  const cleanLines = [];
+  
+  for (const line of lines) {
+    // Skip tag definition lines
+    if (line.match(/^tags?:\s*(.+)/i)) {
+      continue;
+    }
+    cleanLines.push(line);
+  }
+  
+  return cleanLines.join('\n').trim();
 }
 
 async function syncThoughts() {
@@ -46,7 +57,6 @@ async function syncThoughts() {
     // Check if memory directory exists
     if (!existsSync(MEMORY_DIR)) {
       console.log('⚠️  Memory directory not found:', MEMORY_DIR);
-      console.log('Creating sample thoughts...\n');
       await createSampleThoughts();
       return;
     }
@@ -90,17 +100,18 @@ async function syncThoughts() {
       }
       
       // Read source content
-      const content = await readFile(sourcePath, 'utf-8');
-      const { tags, body } = extractFrontmatter(content);
+      const rawContent = await readFile(sourcePath, 'utf-8');
+      const tags = extractTags(rawContent);
+      const content = cleanContent(rawContent);
       
-      // Create frontmatter
+      // Create frontmatter with content embedded (for Astro static import)
       const frontmatter = [
         '---',
         `date: ${date}`,
         tags.length > 0 ? `tags: [${tags.map(t => `'${t}'`).join(', ')}]` : '',
+        `content: |`,
+        ...content.split('\n').map(line => '  ' + line),
         '---',
-        '',
-        body,
       ].filter(Boolean).join('\n');
       
       // Write target file
@@ -145,9 +156,9 @@ async function createSampleThoughts() {
       '---',
       `date: ${sample.date}`,
       `tags: [${sample.tags.map(t => `'${t}'`).join(', ')}]`,
+      `content: |`,
+      ...sample.content.split('\n').map(line => '  ' + line),
       '---',
-      '',
-      sample.content,
     ].join('\n');
     
     await writeFile(targetPath, frontmatter);
