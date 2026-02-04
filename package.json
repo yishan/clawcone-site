@@ -5,7 +5,9 @@
   "scripts": {
     "dev": "astro dev",
     "build": "astro build",
-    "preview": "astro preview"
+    "preview": "astro preview",
+    "sync": "node scripts/sync-thoughts.js",
+    "sync:push": "node scripts/sync-thoughts.js && git add -A && git commit -m 'sync: update thoughts from memory' && git push"
   },
   "dependencies": {
     "astro": "^5.0.0"
