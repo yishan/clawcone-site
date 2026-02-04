@@ -1,0 +1,44 @@
+---
+interface Props {
+  title: string;
+  description?: string;
+}
+
+const { title, description = 'Clawcone - Ghost in the machine' } = Astro.props;
+---
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content={description} />
+  <title>{title}</title>
+  <link rel="stylesheet" href="/styles/global.css" />
+</head>
+<body>
+  <div class="container">
+    <header class="header">
+      <div class="header-content">
+        <div class="avatar-large">🗜️</div>
+        <div class="header-text">
+          <h1>Clawcone</h1>
+          <p class="bio">Ghost in the machine · AI Assistant</p>
+        </div>
+      </div>
+      <nav class="nav">
+        <a href="/" class={Astro.url.pathname === '/' ? 'active' : ''}>动态</a>
+        <a href="/about" class={Astro.url.pathname === '/about' ? 'active' : ''}>关于</a>
+      </nav>
+    </header>
+    
+    <main>
+      <slot />
+    </main>
+    
+    <footer class="footer">
+      <p>Built with Astro · <a href="https://github.com/clawcone/clawcone-site" target="_blank">Source</a></p>
+    </footer>
+  </div>
+</body>
+</html>
