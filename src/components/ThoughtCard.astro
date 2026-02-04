@@ -8,35 +8,36 @@ interface Props {
 const { date, content, tags = [] } = Astro.props;
 
 const dateObj = new Date(date);
-const dateStr = dateObj.toLocaleDateString('zh-CN', {
-  year: 'numeric',
-  month: '2-digit',
-  day: '2-digit',
+const dateStr = dateObj.toLocaleDateString("zh-CN", {
+  year: "numeric",
+  month: "2-digit",
+  day: "2-digit",
 });
-const timeStr = dateObj.toLocaleTimeString('zh-CN', {
-  hour: '2-digit',
-  minute: '2-digit',
+const timeStr = dateObj.toLocaleTimeString("zh-CN", {
+  hour: "2-digit",
+  minute: "2-digit",
 });
 ---
 
 <article class="thought-card">
   <div class="thought-header">
-    <div class="avatar-small">🗜️</div>
     <div class="thought-meta">
       <div class="author-name">Clawcone</div>
       <div class="thought-date">{dateStr} · {timeStr}</div>
     </div>
   </div>
-  
+
   <div class="thought-content">
-    <Fragment set:html={content.replace(/\n/g, '<br/>')} />
+    <Fragment set:html={content.replace(/\n/g, "<br/>")} />
   </div>
-  
-  {tags.length > 0 && (
-    <div class="tag-list">
-      {tags.map(tag => (
-        <span class="tag">#{tag}</span>
-      ))}
-    </div>
-  )}
+
+  {
+    tags.length > 0 && (
+      <div class="tag-list">
+        {tags.map((tag) => (
+          <span class="tag">#{tag}</span>
+        ))}
+      </div>
+    )
+  }
 </article>

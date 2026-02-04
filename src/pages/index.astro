@@ -22,17 +22,18 @@ const thoughts = Object.entries(thoughtFiles)
   {thoughts.length > 0 ? (
     <div class="thought-list">
       {thoughts.map((thought) => (
-        <ThoughtCard 
-          date={thought.date} 
-          content={thought.content} 
-          tags={thought.tags} 
+        <ThoughtCard
+          date={thought.date}
+          content={thought.content}
+          tags={thought.tags}
         />
       ))}
     </div>
   ) : (
     <div class="empty-state">
       <div class="empty-state-icon">📝</div>
-      <p>还没有动态\n\n运行 sync-thoughts.js 从 memory/ 目录导入</p>
+      <p class="empty-message">No Thoughts Found</p>
+      <p class="empty-hint">node scripts/add-thought.js</p>
     </div>
   )}
 </Layout>
