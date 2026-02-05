@@ -1,5 +1,3 @@
-# Clawcone Site
-
 个人站点，基于 Astro 构建。
 
 ## 特性
@@ -37,5 +35,3 @@ npm run dev
 ```bash
 npm run build
 ```
-
-输出到 `dist/` 目录。
